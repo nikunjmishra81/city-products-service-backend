@@ -7,6 +7,12 @@ const express = require("express");
 
 const config = require("./config");
 const models = require("./models");
+const AdminBro = require('admin-bro')
+const AdminBroSequelize = require('@admin-bro/sequelize')
+const AdminBroExpress = require('@admin-bro/express');
+
+
+AdminBro.registerAdapter(AdminBroSequelize)
 
 const app = express();
 
@@ -17,7 +23,14 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
+const AdminBroObj = new AdminBro({
+  databases: [models],
+  rootPath: '/admin',
 
+  //... other AdminBroOptions
+})
+const router = AdminBroExpress.buildRouter(AdminBroObj);
+app.use(AdminBroObj.options.rootPath, router);
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -38,9 +51,10 @@ app.all("*", function (req, resp, next) {
   console.log(req.method, req.url);
   next();
 });
-
+const environment = process.env.use_env_variable
 models.sequelize.authenticate().then(async () => {models.sequelize.authenticate().then(() => console.log("Database connected successfully")).catch(err=>console.log("Database connection error", err))
 await models.sequelize.sync({ }); console.log("Database connected successfully")}).catch(err=>console.log("Database connection error", err))
+app.listen(process.env[`${environment}_CMS_PORT`] || 8080, () => console.log(`CMS Is running @ ${process.env[`${environment}_CMS_PORT`] || 8080} port `));
 
 
 process.on("uncaughtException", (error) => {
