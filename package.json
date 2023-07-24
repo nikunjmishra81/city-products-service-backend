@@ -1,7 +1,7 @@
 {
   "name": "v1",
   "version": "1.0.0",
-  "description": "nodejs caselet v1",
+  "description": "city-products-service-backend",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
